@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PasteBinIngest.Data.DataTransferObjects;
+using PasteBinIngest.Data.Interfaces;
 using PasteBinIngest.Domain.Models;
 using PasteBinIngest.Services;
 using System.Security.Cryptography;
@@ -7,12 +8,12 @@ using System.Text;
 
 namespace PasteBinIngest.Data.Repositories
 {
-    public class PastePinRepository
+    public class PasteBinRepository : IPasteBinRepository
     {
         private readonly string _fileLocation;
         private readonly Loggger _loggger;
 
-        public PastePinRepository(string fileLocation, Loggger loggger)
+        public PasteBinRepository(string fileLocation, Loggger loggger)
         {
             _fileLocation = fileLocation;
             _loggger = loggger;
@@ -21,7 +22,7 @@ namespace PasteBinIngest.Data.Repositories
         public void SaveRequest(PasteBinRequest request)
         {
             _loggger.Debug("save entire request started");
-            
+
             // save each entry
             foreach (var entry in request.PasteBinEntries.ToArray())
             {
@@ -29,7 +30,7 @@ namespace PasteBinIngest.Data.Repositories
 
                 // check if entry exists
                 if (!CheckEntryExists(uri, entry.RawData))
-                { 
+                {
                     // doesnt exists
                     SaveEntry(entry.Id, entry);
                     continue;
@@ -42,13 +43,14 @@ namespace PasteBinIngest.Data.Repositories
 
             // save request
             var entryIds = request.PasteBinEntries.Select(entry => entry.Id).ToArray();
-            var dto = new PasteBinRequestData {
+            var dto = new PasteBinRequestData
+            {
                 Id = request.Id,
                 TimeStamp = request.TimeStamp,
                 EntryIds = entryIds
             };
             var dtoJson = JsonConvert.SerializeObject(dto);
-            
+
             // create directory
             var requestDataPath = _fileLocation + Constants.RequestDirectory;
             Directory.CreateDirectory(requestDataPath);
@@ -67,7 +69,8 @@ namespace PasteBinIngest.Data.Repositories
             _loggger.Debug("save entry started");
 
             var hash = GetSha512HashOfData(entry.RawData);
-            var dto = new PasteBinData {
+            var dto = new PasteBinData
+            {
                 Id = entry.Id,
                 RequestId = requestId,
                 Name = entry.Name,

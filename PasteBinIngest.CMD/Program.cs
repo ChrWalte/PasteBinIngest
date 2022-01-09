@@ -1,5 +1,5 @@
-﻿
-// Imports:
+﻿// Imports:
+using PasteBinIngest.Data.Interfaces;
 using PasteBinIngest.Data.Repositories;
 using PasteBinIngest.Services;
 
@@ -16,5 +16,5 @@ var pasteBinService = new PasteBinService(pastebinBaseUrl, pastebinRawUrl, loggg
 var request = pasteBinService.GetRequest();
 
 // Data Layer:
-var pasteBinRepository = new PastePinRepository(dataSaveLocation, loggger);
+IPasteBinRepository pasteBinRepository = new PasteBinRepository(dataSaveLocation, loggger);
 pasteBinRepository.SaveRequest(request);

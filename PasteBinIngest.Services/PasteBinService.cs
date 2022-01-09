@@ -38,7 +38,7 @@ namespace PasteBinIngest.Services
 
                 var title = linkOrNull?.InnerText;
                 if (title == null) { continue; }
-                
+
                 // skip syntax archive links, build with?
                 if (uri.Contains("archive")) { continue; }
 
