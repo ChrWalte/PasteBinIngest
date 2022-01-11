@@ -21,7 +21,7 @@ namespace PasteBinIngest.Data.Repositories
 
         public void SaveRequest(PasteBinRequest request)
         {
-            _loggger.Debug("save entire request started");
+            _loggger.Debug("save entire request started 🏃");
 
             // save each entry
             foreach (var entry in request.PasteBinEntries.ToArray())
@@ -61,13 +61,11 @@ namespace PasteBinIngest.Data.Repositories
             _loggger.Debug("wrote request file");
 
             _loggger.LogObject("request object", dto);
-            _loggger.Debug("saving entire request ended");
+            _loggger.Debug("saving entire request finished 🏁");
         }
 
         public void SaveEntry(Guid requestId, PasteBinEntry entry)
         {
-            _loggger.Debug("save entry started");
-
             var hash = GetSha512HashOfData(entry.RawData);
             var dto = new PasteBinData
             {
@@ -101,13 +99,10 @@ namespace PasteBinIngest.Data.Repositories
             _loggger.Debug("wrote quick-hash file");
 
             _loggger.LogObject("entry object", dto);
-            _loggger.Debug("saving entry ended");
         }
 
         public bool CheckEntryExists(string uri, string rawData)
         {
-            _loggger.Debug("checking existing entry hash started");
-
             // hash of data
             var hash = GetSha512HashOfData(rawData);
 
@@ -122,15 +117,12 @@ namespace PasteBinIngest.Data.Repositories
             var isExists = readHash == hash;
 
             _loggger.Info($"checked existing hash, equal: {isExists}");
-            _loggger.Debug("checking existing entry hash ended");
 
             return isExists;
         }
 
-        private string GetSha512HashOfData(string rawData)
+        private static string GetSha512HashOfData(string rawData)
         {
-            _loggger.Debug("calculating hash");
-
             // get byte hash of rawdata
             var rawBytes = Encoding.ASCII.GetBytes(rawData);
             using var sha512 = SHA512.Create();
@@ -142,8 +134,6 @@ namespace PasteBinIngest.Data.Repositories
             { stringBuilder.Append(b.ToString("x2")); }
             var result = stringBuilder.ToString();
             stringBuilder.Clear();
-
-            _loggger.Debug("calculated hash");
 
             return result;
         }

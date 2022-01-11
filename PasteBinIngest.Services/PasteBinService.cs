@@ -18,7 +18,7 @@ namespace PasteBinIngest.Services
 
         public PasteBinRequest GetRequest()
         {
-            _loggger.Debug("pastebin request started");
+            _loggger.Debug("pastebin request started 🏃");
 
             var pasteBinRequest = new PasteBinRequest();
             var rawHtml = GetHtmlDocument(_pasteBinArchiveUrl);
@@ -44,21 +44,19 @@ namespace PasteBinIngest.Services
 
                 var rawDataUrl = _pasteBinRawUrl + uri;
                 var rawData = GetHtmlDocument(rawDataUrl).Text;
-
+                
                 var pasteBinEntry = new PasteBinEntry(title, uri, rawData);
                 pasteBinRequest.PasteBinEntries.Add(pasteBinEntry);
             }
 
             _loggger.Info($"found {pasteBinRequest.PasteBinEntries.Count} total entries");
-            _loggger.Debug("pastebin request ended");
+            _loggger.Debug("pastebin request finished 🏁");
 
             return pasteBinRequest;
         }
 
         private HtmlDocument GetHtmlDocument(string url)
         {
-            _loggger.Debug("getting html document");
-
             // create the request
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add(Constants.UserAgentHeader, Constants.UserAgentFirefox);
@@ -75,8 +73,6 @@ namespace PasteBinIngest.Services
             // raw html code
             var rawHtml = new HtmlDocument();
             rawHtml.LoadHtml(result);
-
-            _loggger.Debug("got html document");
 
             return rawHtml;
         }
