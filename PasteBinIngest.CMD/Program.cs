@@ -5,6 +5,8 @@ using PasteBinIngest.Services;
 
 // load configuration
 // handle arguments
+// you just have them:
+// args
 
 // WILL REPLACE:
 // Constants:
@@ -24,6 +26,3 @@ var request = pasteBinService.GetRequest(pastebinBaseUrl);
 // MOVE INTO SERVICE
 IPasteBinRepository pasteBinRepository = new PasteBinRepository(dataSaveLocation, loggger);
 pasteBinRepository.SaveRequest(request);
-
-// DEBUGGING:
-Console.ReadKey();

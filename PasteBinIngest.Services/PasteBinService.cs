@@ -44,7 +44,7 @@ namespace PasteBinIngest.Services
 
                 var rawDataUrl = _pasteBinRawUrl + uri;
                 var rawData = GetHtmlDocument(rawDataUrl).Text;
-                
+
                 var pasteBinEntry = new PasteBinEntry(title, uri, rawData);
                 pasteBinRequest.PasteBinEntries.Add(pasteBinEntry);
             }
