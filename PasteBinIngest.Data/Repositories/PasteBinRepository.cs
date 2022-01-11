@@ -21,11 +21,12 @@ namespace PasteBinIngest.Data.Repositories
 
         public void SaveRequest(PasteBinRequest request)
         {
-            _loggger.Debug("save entire request started 🏃");
+            _loggger.Debug("save entire request started->");
 
             // save each entry
             foreach (var entry in request.PasteBinEntries.ToArray())
             {
+                // remove the / from the uri for the folder name
                 var uri = entry.Uri[1..];
 
                 // check if entry exists
@@ -61,7 +62,7 @@ namespace PasteBinIngest.Data.Repositories
             _loggger.Debug("wrote request file");
 
             _loggger.LogObject("request object", dto);
-            _loggger.Debug("saving entire request finished 🏁");
+            _loggger.Debug("->saving entire request finished");
         }
 
         public void SaveEntry(Guid requestId, PasteBinEntry entry)

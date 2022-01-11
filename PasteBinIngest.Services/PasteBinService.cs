@@ -5,23 +5,21 @@ namespace PasteBinIngest.Services
 {
     public class PasteBinService
     {
-        private readonly string _pasteBinArchiveUrl;
         private readonly string _pasteBinRawUrl;
         private readonly Loggger _loggger;
 
-        public PasteBinService(string pasteBinArchiveUrl, string pasteBinRawUrl, Loggger loggger)
+        public PasteBinService(string pasteBinRawUrl, Loggger loggger)
         {
-            _pasteBinArchiveUrl = pasteBinArchiveUrl;
             _pasteBinRawUrl = pasteBinRawUrl;
             _loggger = loggger;
         }
 
-        public PasteBinRequest GetRequest()
+        public PasteBinRequest GetRequest(string pasteBinUrl)
         {
-            _loggger.Debug("pastebin request started 🏃");
+            _loggger.Debug("pastebin request started->");
 
             var pasteBinRequest = new PasteBinRequest();
-            var rawHtml = GetHtmlDocument(_pasteBinArchiveUrl);
+            var rawHtml = GetHtmlDocument(pasteBinUrl);
 
             // extracts all links from pastebin archive table
             var dataLinksOrNulls = rawHtml.DocumentNode.SelectSingleNode(Constants.PasteBinTableSelector)
@@ -33,9 +31,11 @@ namespace PasteBinIngest.Services
 
             foreach (var linkOrNull in dataLinksOrNulls)
             {
+                // no uri, continue
                 var uri = linkOrNull?.GetAttributeValue(Constants.Href, null);
                 if (uri == null) { continue; }
 
+                // no inner text, continue
                 var title = linkOrNull?.InnerText;
                 if (title == null) { continue; }
 
@@ -50,12 +50,12 @@ namespace PasteBinIngest.Services
             }
 
             _loggger.Info($"found {pasteBinRequest.PasteBinEntries.Count} total entries");
-            _loggger.Debug("pastebin request finished 🏁");
+            _loggger.Debug("->pastebin request finished");
 
             return pasteBinRequest;
         }
 
-        private HtmlDocument GetHtmlDocument(string url)
+        private static HtmlDocument GetHtmlDocument(string url)
         {
             // create the request
             var request = new HttpRequestMessage(HttpMethod.Get, url);

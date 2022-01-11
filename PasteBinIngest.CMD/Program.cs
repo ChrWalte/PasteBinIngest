@@ -3,18 +3,27 @@ using PasteBinIngest.Data.Interfaces;
 using PasteBinIngest.Data.Repositories;
 using PasteBinIngest.Services;
 
-// Loggger:
-var loggger = new Loggger("E:\\pastebin\\logs");
+// load configuration
+// handle arguments
 
+// WILL REPLACE:
 // Constants:
 const string pastebinBaseUrl = "https://pastebin.com/archive";
 const string pastebinRawUrl = "https://pastebin.com/raw";
 const string dataSaveLocation = "E:\\pastebin";
+const string logSaveLocation = "E:\\pastebin\\logs";
 
-// Service Layer:
-var pasteBinService = new PasteBinService(pastebinBaseUrl, pastebinRawUrl, loggger);
-var request = pasteBinService.GetRequest();
+// Loggger:
+var loggger = new Loggger(logSaveLocation);
 
-// Data Layer:
+// Service Setup:
+var pasteBinService = new PasteBinService(pastebinRawUrl, loggger);
+var request = pasteBinService.GetRequest(pastebinBaseUrl);
+
+// Data Setup:
+// MOVE INTO SERVICE
 IPasteBinRepository pasteBinRepository = new PasteBinRepository(dataSaveLocation, loggger);
 pasteBinRepository.SaveRequest(request);
+
+// DEBUGGING:
+Console.ReadKey();
