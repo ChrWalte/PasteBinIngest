@@ -14,7 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PasteBinIngest.Data\PasteBinIngest.Data.csproj" />
     <ProjectReference Include="..\PasteBinIngest.Domain\PasteBinIngest.Domain.csproj" />
+    <ProjectReference Include="..\PasteBinIngest.Shared\PasteBinIngest.Shared.csproj" />
   </ItemGroup>
 
 </Project>

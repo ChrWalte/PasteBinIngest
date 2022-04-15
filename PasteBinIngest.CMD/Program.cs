@@ -1,28 +1,20 @@
 ﻿// Imports:
-using PasteBinIngest.Data.Interfaces;
+using PasteBinIngest.CMD;
 using PasteBinIngest.Data.Repositories;
 using PasteBinIngest.Services;
-
-// load configuration
-// handle arguments
-// you just have them:
-// args
-
-// WILL REPLACE:
-// Constants:
-const string pastebinBaseUrl = "https://pastebin.com/archive";
-const string pastebinRawUrl = "https://pastebin.com/raw";
-const string dataSaveLocation = "E:\\pastebin";
-const string logSaveLocation = "E:\\pastebin\\logs";
+using PasteBinIngest.Shared;
 
 // Loggger:
-var loggger = new Loggger(logSaveLocation);
+var loggger = new Loggger(Constants.LogSaveLocation);
+await loggger.Debug(Constants.InitLogger);
 
-// Service Setup:
-var pasteBinService = new PasteBinService(pastebinRawUrl, loggger);
-var request = pasteBinService.GetRequest(pastebinBaseUrl);
+// pastebin setup:
+var pasteBinRepository = new PasteBinRepository(Constants.DataSaveLocation, loggger);
+var pasteBinService = new PasteBinService(Constants.PastebinRawUrl, pasteBinRepository, loggger);
+await loggger.Debug(Constants.InitRepoAndService);
 
-// Data Setup:
-// MOVE INTO SERVICE
-IPasteBinRepository pasteBinRepository = new PasteBinRepository(dataSaveLocation, loggger);
-pasteBinRepository.SaveRequest(request);
+await loggger.Debug(Constants.StartedRequestLog);
+var request = await pasteBinService.SendPasteBinRequestAsync(Constants.PastebinBaseUrl);
+await pasteBinService.SavePasteBinRequestAsync(request);
+await loggger.Debug(Constants.FinishedRequestLog);
+await loggger.Debug(Constants.ExitedLog);

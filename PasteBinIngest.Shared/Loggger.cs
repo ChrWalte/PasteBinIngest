@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace PasteBinIngest.Services
+namespace PasteBinIngest.Shared
 {
     public class Loggger
     {
@@ -12,25 +12,25 @@ namespace PasteBinIngest.Services
             Directory.CreateDirectory(_fileLocation);
         }
 
-        public void Debug(string details)
-            => Log(details, "DEBUG");
+        public async Task Debug(string details)
+            => await Log(details, "  DEBUG  ");
 
-        public void Info(string details)
-            => Log(details, "INFO");
+        public async Task Info(string details)
+            => await Log(details, "  INFO   ");
 
-        public void Warning(string details)
-            => Log(details, "WARNING");
+        public async Task Warning(string details)
+            => await Log(details, " WARNING ");
 
-        public void Error(string details)
-            => Log(details, "ERROR");
+        public async Task Error(string details)
+            => await Log(details, "  ERROR  ");
 
-        public void LogObject(string details, object data)
+        public async Task LogObject(string details, object data)
         {
             var dataJson = JsonConvert.SerializeObject(data);
-            Log($"{details} ~ {dataJson}", "OBJECT");
+            await Log($"{details} ~ {dataJson}", " OBJECT  ");
         }
 
-        private void Log(string details, string level)
+        private async Task Log(string details, string level)
         {
             var timestamp = DateTime.Now;
             var filename = timestamp.ToString("MMddyyyy") + ".log";
@@ -40,12 +40,12 @@ namespace PasteBinIngest.Services
             try
             {
                 Console.Write(fullLog);
-                File.AppendAllText(fullPath, fullLog);
+                await File.AppendAllTextAsync(fullPath, fullLog);
             }
             catch (Exception ex)
             {
                 var exJson = JsonConvert.SerializeObject(ex);
-                Console.WriteLine($"~EXCEPTION WHILE LOGGING: {exJson}");
+                Console.WriteLine($"[~EXCEPTION WHILE LOGGING]: {exJson}");
                 throw;
             }
         }
