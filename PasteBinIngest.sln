@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasteBinIngest.CMD", "Paste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasteBinIngest.API", "PasteBinIngest.API\PasteBinIngest.API.csproj", "{C7596EF2-1349-44D8-9AC6-3752BF7700C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasteBinIngest.Shared", "PasteBinIngest.Shared\PasteBinIngest.Shared.csproj", "{E4CE1366-22E9-43F5-A87B-907A37872105}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasteBinIngest.Shared", "PasteBinIngest.Shared\PasteBinIngest.Shared.csproj", "{E4CE1366-22E9-43F5-A87B-907A37872105}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasteBinIngest.Scripts", "PasteBinIngest.Scripts\PasteBinIngest.Scripts.csproj", "{FDE74BC1-F1AA-4A29-9586-BC24FD4912EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{E4CE1366-22E9-43F5-A87B-907A37872105}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4CE1366-22E9-43F5-A87B-907A37872105}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4CE1366-22E9-43F5-A87B-907A37872105}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDE74BC1-F1AA-4A29-9586-BC24FD4912EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDE74BC1-F1AA-4A29-9586-BC24FD4912EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDE74BC1-F1AA-4A29-9586-BC24FD4912EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDE74BC1-F1AA-4A29-9586-BC24FD4912EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,8 @@
 ﻿namespace PasteBinIngest.Data.DataTransferObjects
 {
+    /// <summary>
+    /// paste bin entry DTO.
+    /// </summary>
     internal class PasteBinData
     {
         public Guid Id { get; set; }
