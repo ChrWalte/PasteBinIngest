@@ -1,5 +1,23 @@
 # PasteBinIngest Change Log
 
+## VERSION 2.0.0
+
+- fixed existing data check
+- changed implementation of getting request data to make it faster
+- created script to clean up and remove duplicate entry data
+- this script will load all existing data into memory, loop through all the data, and remove any duplicates. it will then save the data back to disk
+- finished adding API controllers
+- added/updated documentation
+
+## VERSION 1.0.1
+
+- started adding API controllers
+- started to rethink data save structure due to slow data retrieval
+- created script to adjust existing data into new format
+- after data structure changes, data retrieval is way faster
+- data changes broke existing data check, this caused every request to save every entry
+- data grew exponentially due to broken existing data check
+
 ## VERSION 1.0.0
 
 - major changes made as problems were found in async calls

@@ -2,15 +2,25 @@
 using PasteBinIngest.Data.Interfaces;
 using PasteBinIngest.Domain.Models;
 using PasteBinIngest.Shared;
+using System.Security.Cryptography;
 
 namespace PasteBinIngest.Services
 {
+    /// <summary>
+    /// the pastebin service that handles all things pastebin logic.
+    /// </summary>
     public class PasteBinService
     {
         private readonly string _pasteBinRawUrl;
         private readonly IPasteBinRepository _pasteBinRepository;
         private readonly Loggger _loggger;
 
+        /// <summary>
+        /// initialize the pastebin service with a starting pastebin URL, a data repository, and a logger.
+        /// </summary>
+        /// <param name="pasteBinRawUrl">a valid pastebin URL to pull data from</param>
+        /// <param name="pasteBinRepository">a pastebin data repository</param>
+        /// <param name="loggger">a logger to log messages</param>
         public PasteBinService(string pasteBinRawUrl, IPasteBinRepository pasteBinRepository, Loggger loggger)
         {
             _pasteBinRawUrl = pasteBinRawUrl;
@@ -18,6 +28,24 @@ namespace PasteBinIngest.Services
             _loggger = loggger;
         }
 
+        /// <summary>
+        /// get pastebin request objects from the data repository by GUIDs.
+        /// optional flag for including entry objects with request objects.
+        /// </summary>
+        /// <param name="ids">the GUIDs of the requests wanted</param>
+        /// <param name="withEntries">flag to include entries or not</param>
+        /// <returns> a list of pastebin request objects</returns>
+        public async Task<IEnumerable<PasteBinRequest>> GetPasteBinRequestsByIdsAsync(IEnumerable<Guid> ids, bool withEntries = false)
+        {
+            var requests = await _pasteBinRepository.GetRequestsByIdsAsync(ids, withEntries);
+            return requests;
+        }
+
+        /// <summary>
+        /// send a pastebin request and get entry data.
+        /// </summary>
+        /// <param name="basePasteBinUrl">the pastebin URL to extract data from</param>
+        /// <returns>a pastebin request object with entry objects</returns>
         public async Task<PasteBinRequest> SendPasteBinRequestAsync(string basePasteBinUrl)
         {
             var pasteBinRequest = new PasteBinRequest(basePasteBinUrl);
@@ -51,8 +79,13 @@ namespace PasteBinIngest.Services
                     var rawDataUrl = _pasteBinRawUrl + uri;
                     var rawData = await GetHtmlDocument(rawDataUrl);
                     var pasteBinEntry = new PasteBinEntry(title, uri, rawData.Text);
-                    pasteBinRequest.PasteBinEntries.Add(pasteBinEntry);
-                    await _loggger.Info($"added to pasteBinRequest.PasteBinEntries for a total count of {pasteBinRequest.PasteBinEntries.Count}");
+                    pasteBinRequest.PasteBinEntries?.Add(pasteBinEntry);
+                    await _loggger.Info($"added to pasteBinRequest.PasteBinEntries for a total count of {pasteBinRequest.PasteBinEntries?.Count}");
+
+                    // sleep a random amount of time, to throw off pastebin servers...
+                    var randomNumber = RandomNumberGenerator.GetInt32(20000);
+                    await _loggger.Info($"sleeping for {(10000 + randomNumber) / 1000} seconds...");
+                    Thread.Sleep(millisecondsTimeout: 10000 + randomNumber);
                 }
                 catch (Exception ex)
                 {
@@ -64,6 +97,10 @@ namespace PasteBinIngest.Services
             return pasteBinRequest;
         }
 
+        /// <summary>
+        /// save the pastebin request using the data repository.
+        /// </summary>
+        /// <param name="request">the request to save</param>
         public async Task SavePasteBinRequestAsync(PasteBinRequest request)
         {
             await _loggger.Debug("starting to save request...");
@@ -71,6 +108,11 @@ namespace PasteBinIngest.Services
             await _loggger.Debug("finished saving request");
         }
 
+        /// <summary>
+        /// gets the raw HTML document from the URL and returns it.
+        /// </summary>
+        /// <param name="url">the URL to get the HTML from</param>
+        /// <returns></returns>
         private static async Task<HtmlDocument> GetHtmlDocument(string url)
         {
             // create the request
