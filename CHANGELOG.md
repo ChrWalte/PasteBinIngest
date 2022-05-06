@@ -1,5 +1,11 @@
 # PasteBinIngest Change Log
 
+## VERSION 2.1.0
+
+- complete project refactor
+- many renames and some code clean up
+- updated README.md
+
 ## VERSION 2.0.0
 
 - fixed existing data check
