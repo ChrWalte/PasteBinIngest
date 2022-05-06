@@ -1,21 +1,20 @@
-﻿
-// Imports:
+﻿// Imports:
 using paste.bin.ingest.cmd;
 using paste.bin.ingest.core.data.Repositories;
 using paste.bin.ingest.core.services;
 
-// Loggger:
-var loggger = new Loggger(Constants.LogSaveLocation);
-await loggger.Debug(Constants.InitLogger);
+// Logger:
+var logger = new Logger(Constants.LogSaveLocation);
+await logger.Debug(Constants.InitLogger);
 
-// pastebin setup:
-var pasteBinRepository = new PasteBinRepository(Constants.DataSaveLocation, loggger);
-var pasteBinService = new PasteBinService(Constants.PastebinRawUrl, pasteBinRepository, loggger);
-await loggger.Debug(Constants.InitRepoAndService);
+// paste bin setup:
+var pasteBinRepository = new PasteBinRepository(Constants.DataSaveLocation, logger);
+var pasteBinService = new PasteBinService(Constants.PasteBinRawUrl, pasteBinRepository, logger);
+await logger.Debug(Constants.InitRepoAndService);
 
-// send and save the pastebin request
-await loggger.Debug(Constants.StartedRequestLog);
-var request = await pasteBinService.SendPasteBinRequestAsync(Constants.PastebinBaseUrl);
+// send and save the paste bin request
+await logger.Debug(Constants.StartedRequestLog);
+var request = await pasteBinService.SendPasteBinRequestAsync(Constants.PasteBinBaseUrl);
 await pasteBinService.SavePasteBinRequestAsync(request);
-await loggger.Debug(Constants.FinishedRequestLog);
-await loggger.Debug(Constants.ExitedLog);
+await logger.Debug(Constants.FinishedRequestLog);
+await logger.Debug(Constants.ExitedLog);

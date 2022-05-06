@@ -5,20 +5,20 @@ using paste.bin.ingest.core.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Loggger:
-var loggger = new Loggger(Constants.LogSaveLocation);
-await loggger.Debug(Constants.InitLogger);
+// Logger:
+var logger = new Logger(Constants.LogSaveLocation);
+await logger.Debug(Constants.InitLogger);
 
-// pastebin setup:
-var pastebinRepository = new PasteBinRepository(Constants.DataSaveLocation, loggger);
-var pastebinService = new PasteBinService(Constants.PastebinRawUrl, pastebinRepository, loggger);
-await loggger.Debug(Constants.InitRepoAndService);
+// paste bin setup:
+var pasteBinRepository = new PasteBinRepository(Constants.DataSaveLocation, logger);
+var pasteBinService = new PasteBinService(Constants.PasteBinRawUrl, pasteBinRepository, logger);
+await logger.Debug(Constants.InitRepoAndService);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddSingleton(loggger);
-builder.Services.AddSingleton<IPasteBinRepository>(pastebinRepository);
-builder.Services.AddSingleton(pastebinService);
+builder.Services.AddSingleton(logger);
+builder.Services.AddSingleton<IPasteBinRepository>(pasteBinRepository);
+builder.Services.AddSingleton(pasteBinService);
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>();
@@ -43,8 +43,8 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapGraphQL();
 
-await loggger.Debug("starting handling HTTP requests...");
+await logger.Debug("starting handling HTTP requests...");
 app.Run();
 
-await loggger.Debug("finished handling HTTP requests");
-await loggger.Debug(Constants.ExitedLog);
+await logger.Debug("finished handling HTTP requests");
+await logger.Debug(Constants.ExitedLog);

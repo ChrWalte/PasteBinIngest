@@ -3,7 +3,7 @@
 namespace paste.bin.ingest.core.data.Interfaces
 {
     /// <summary>
-    /// pastebin data repository interface.
+    /// paste bin data repository interface.
     /// </summary>
     public interface IPasteBinRepository
     {

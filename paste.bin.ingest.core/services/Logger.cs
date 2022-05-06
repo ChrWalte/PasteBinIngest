@@ -1,9 +1,11 @@
-﻿namespace paste.bin.ingest.core.services
+﻿using Newtonsoft.Json;
+
+namespace paste.bin.ingest.core.services
 {
     /// <summary>
     /// a logger that writes messages to the console and a file.
     /// </summary>
-    public class Loggger
+    public class Logger
     {
         private readonly string _fileLocation;
 
@@ -11,7 +13,7 @@
         /// initialize the logger and tell it where to store the log files.
         /// </summary>
         /// <param name="fileLocation">the file location of the log files</param>
-        public Loggger(string fileLocation)
+        public Logger(string fileLocation)
         {
             _fileLocation = fileLocation;
             Directory.CreateDirectory(_fileLocation);

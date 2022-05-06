@@ -1,30 +1,30 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using paste.bin.ingest.core.data.DataTransferObjects;
 using paste.bin.ingest.core.data.Interfaces;
 using paste.bin.ingest.core.models;
 using paste.bin.ingest.core.services;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace paste.bin.ingest.core.data.Repositories
 {
     /// <summary>
-    /// repository for pastebin data.
+    /// repository for paste bin data.
     /// </summary>
     public class PasteBinRepository : IPasteBinRepository
     {
         private readonly string _fileLocation;
-        private readonly Loggger _loggger;
+        private readonly Logger _logger;
 
         /// <summary>
-        /// initialize the pastebin data repository.
+        /// initialize the paste bin data repository.
         /// </summary>
         /// <param name="fileLocation">the file location to store the data</param>
-        /// <param name="loggger">the logger to log messages</param>
-        public PasteBinRepository(string fileLocation, Loggger loggger)
+        /// <param name="logger">the logger to log messages</param>
+        public PasteBinRepository(string fileLocation, Logger logger)
         {
             _fileLocation = fileLocation;
-            _loggger = loggger;
+            _logger = logger;
         }
 
         /// <summary>
@@ -35,16 +35,16 @@ namespace paste.bin.ingest.core.data.Repositories
         {
             var requestsDiskLocation = Path.Combine(_fileLocation, Constants.RequestDirectory[1..]);
             var fileNames = Directory.GetFiles(requestsDiskLocation);
-            await _loggger.Info($"got {fileNames.Length} request ids from request folder");
+            await _logger.Info($"got {fileNames.Length} request ids from request folder");
 
             var cleanedFileNames = fileNames.Select(dir
                 => dir[requestsDiskLocation.Length..].Replace("\\", string.Empty))
                 .ToArray();
-            await _loggger.Debug($"cleaned {fileNames.Length} request ids by removing directory path");
+            await _logger.Debug($"cleaned {fileNames.Length} request ids by removing directory path");
 
             var requestIds = cleanedFileNames.Select(fileName
                 => Guid.TryParse(fileName, out var id) ? id : Guid.Empty).ToList();
-            await _loggger.Debug($"converted {fileNames.Length} request ids into GUIDs");
+            await _logger.Debug($"converted {fileNames.Length} request ids into GUIDs");
 
             return requestIds;
         }
@@ -57,27 +57,27 @@ namespace paste.bin.ingest.core.data.Repositories
         {
             var entityDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory[1..]);
             var dirs = Directory.GetDirectories(entityDiskLocation);
-            await _loggger.Info($"got {dirs.Length} entry URLs from entry folder");
+            await _logger.Info($"got {dirs.Length} entry URLs from entry folder");
 
             // remove entityDataPath from each URL
             var cleanedDirs = dirs.Select(dir
                     => dir[entityDiskLocation.Length..].Replace("\\", string.Empty))
                 .ToArray();
-            await _loggger.Debug($"cleaned {dirs.Length} entry URLs by removing directory path");
+            await _logger.Debug($"cleaned {dirs.Length} entry URLs by removing directory path");
 
             var entryIds = cleanedDirs.Select(fileName
                 => Guid.TryParse(fileName, out var id) ? id : Guid.Empty).ToList();
-            await _loggger.Debug($"converted {dirs.Length} entry ids into GUIDs");
+            await _logger.Debug($"converted {dirs.Length} entry ids into GUIDs");
             return entryIds;
         }
 
         /// <summary>
-        /// gets pastebin requests by GUIDs.
+        /// gets paste bin requests by GUIDs.
         /// optional flag to include entry objects with requests.
         /// </summary>
         /// <param name="ids">the GUIDs of the requests wanted</param>
         /// <param name="withEntries">the flag to include entries</param>
-        /// <returns>a list of pastebin requests</returns>
+        /// <returns>a list of paste bin requests</returns>
         public async Task<IEnumerable<PasteBinRequest>> GetRequestsByIdsAsync(IEnumerable<Guid> ids, bool withEntries = false)
         {
             var givenIds = ids.ToList();
@@ -85,10 +85,10 @@ namespace paste.bin.ingest.core.data.Repositories
                 return new List<PasteBinRequest>();
 
             var requests = new List<PasteBinRequest>();
-            await _loggger.Info($"getting {requests.Count} requests...");
+            await _logger.Info($"getting {requests.Count} requests...");
             foreach (var id in givenIds)
             {
-                await _loggger.Info($"starting to get {id} from disk...");
+                await _logger.Info($"starting to get {id} from disk...");
                 var requestDataPath = _fileLocation + Constants.RequestDirectory;
                 var requestFilename = Path.Combine(requestDataPath, id.ToString());
                 var requestDtoJson = await File.ReadAllTextAsync(requestFilename);
@@ -96,11 +96,11 @@ namespace paste.bin.ingest.core.data.Repositories
 
                 if (requestDto == null)
                 {
-                    await _loggger.Warning($"request {id} came back as null");
-                    await _loggger.LogObject($"request [{id}]", requestDtoJson);
+                    await _logger.Warning($"request {id} came back as null");
+                    await _logger.LogObject($"request [{id}]", requestDtoJson);
                     continue;
                 }
-                await _loggger.Debug($"read in requestDto from disk");
+                await _logger.Debug($"read in requestDto from disk");
 
                 var request = new PasteBinRequest
                 {
@@ -111,23 +111,23 @@ namespace paste.bin.ingest.core.data.Repositories
                         ? (await GetEntriesByIdsAsync(requestDto.EntryIds ?? Array.Empty<Guid>(), true)).ToList()
                         : requestDto.EntryIds?.Select(eId => new PasteBinEntry { Id = eId }).ToList()
                 };
-                await _loggger.Debug($"created PasteBinRequest from PasteBinRequestData");
+                await _logger.Debug($"created PasteBinRequest from PasteBinRequestData");
 
                 requests.Add(request);
-                await _loggger.Info($"added request {id} to return requests, making total: {requests.Count}");
+                await _logger.Info($"added request {id} to return requests, making total: {requests.Count}");
             }
-            await _loggger.Info($"finished getting requests");
+            await _logger.Info($"finished getting requests");
 
             return requests;
         }
 
         /// <summary>
-        /// gets pastebin entries by GUIDs.
+        /// gets paste bin entries by GUIDs.
         /// optional flag to include entry raw data with objects.
         /// </summary>
         /// <param name="ids">the GUIDs of the wanted entries</param>
         /// <param name="withRawData">the flag to include entry raw data</param>
-        /// <returns>a list of pastebin entries</returns>
+        /// <returns>a list of paste bin entries</returns>
         public async Task<IEnumerable<PasteBinEntry>> GetEntriesByIdsAsync(IEnumerable<Guid> ids, bool withRawData = false)
         {
             var wantedIds = ids.ToList();
@@ -135,12 +135,12 @@ namespace paste.bin.ingest.core.data.Repositories
             var allEntryDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory[1..]);
             foreach (var id in wantedIds)
             {
-                await _loggger.Info($"checking {id} entry from disk...");
+                await _logger.Info($"checking {id} entry from disk...");
                 var entryLocation = Path.Combine(allEntryDiskLocation, id.ToString());
                 var entryDataLocation = Path.Combine(entryLocation, Constants.Data);
                 if (!File.Exists(entryDataLocation))
                 {
-                    await _loggger.Warning($"entry [{id}] data object file not found, skipping");
+                    await _logger.Warning($"entry [{id}] data object file not found, skipping");
                     continue;
                 }
 
@@ -148,11 +148,11 @@ namespace paste.bin.ingest.core.data.Repositories
                 var entryDto = JsonConvert.DeserializeObject<PasteBinData>(entryDtoJson);
                 if (entryDto == null)
                 {
-                    await _loggger.Warning($"entry {id} came back as null");
-                    await _loggger.LogObject($"entry [{id}]", entryDtoJson);
+                    await _logger.Warning($"entry {id} came back as null");
+                    await _logger.LogObject($"entry [{id}]", entryDtoJson);
                     continue;
                 }
-                await _loggger.Debug($"read in entryDto from disk");
+                await _logger.Debug($"read in entryDto from disk");
 
                 var entry = new PasteBinEntry
                 {
@@ -162,34 +162,34 @@ namespace paste.bin.ingest.core.data.Repositories
                     Created = entryDto.Created,
                     RawData = string.Empty,
                 };
-                await _loggger.Debug($"created PasteBinEntry from PasteBinData");
+                await _logger.Debug($"created PasteBinEntry from PasteBinData");
 
                 if (withRawData)
                 {
                     var entryRawDataLocation = Path.Combine(entryLocation, Constants.Raw);
                     if (!File.Exists(entryRawDataLocation))
                     {
-                        await _loggger.Warning($"entry [{id}] data file not found, skipping");
+                        await _logger.Warning($"entry [{id}] data file not found, skipping");
                         continue;
                     }
                     else
                     {
                         var entryRawData = await File.ReadAllTextAsync(entryRawDataLocation);
                         entry.RawData = entryRawData;
-                        await _loggger.Info($"added {entryDto.Id} entry raw data");
+                        await _logger.Info($"added {entryDto.Id} entry raw data");
                     }
                 }
 
                 wantedEntries.Add(entry);
-                await _loggger.Info($"added entry to wantedEntries, making total: {wantedEntries.Count}");
+                await _logger.Info($"added entry to wantedEntries, making total: {wantedEntries.Count}");
 
                 if (wantedEntries.Count != wantedIds.Count)
                     continue;
 
-                await _loggger.Info($"all entries found, no need to continue search");
+                await _logger.Info($"all entries found, no need to continue search");
                 break;
             }
-            await _loggger.Info($"finished getting entries");
+            await _logger.Info($"finished getting entries");
 
             return wantedEntries;
         }
@@ -204,7 +204,7 @@ namespace paste.bin.ingest.core.data.Repositories
         {
             if (request.PasteBinEntries == null || request.PasteBinEntries.Count == 0)
             {
-                await _loggger.Warning($"request contained 0 entries, skipping");
+                await _logger.Warning($"request contained 0 entries, skipping");
                 return;
             }
 
@@ -212,7 +212,7 @@ namespace paste.bin.ingest.core.data.Repositories
             var entries = request.PasteBinEntries?.ToList() ?? new List<PasteBinEntry>();
             foreach (var entry in entries)
             {
-                await _loggger.Info($"checking entry [{entry.Uri}][{entry.Id}]...");
+                await _logger.Info($"checking entry [{entry.Uri}][{entry.Id}]...");
 
                 // check if entry exists
                 var id = entry.Id.ToString();
@@ -220,15 +220,15 @@ namespace paste.bin.ingest.core.data.Repositories
                 {
                     // doesn't exists
                     await SaveEntryAsync(entry.Id, entry);
-                    await _loggger.Info($"entry saved to [{entry.Id}]");
+                    await _logger.Info($"entry saved to [{entry.Id}]");
                     continue;
                 }
 
                 // already exists
                 request.PasteBinEntries?.Remove(entry);
-                await _loggger.Info($"entry [{entry.Id}] already exist and unchanged, removed from request");
+                await _logger.Info($"entry [{entry.Id}] already exist and unchanged, removed from request");
             }
-            await _loggger.Debug("finished saving entries");
+            await _logger.Debug("finished saving entries");
 
             // save request
             var entryIds = request.PasteBinEntries?.Select(entry => entry.Id).ToArray();
@@ -239,17 +239,17 @@ namespace paste.bin.ingest.core.data.Repositories
                 EntryIds = entryIds
             };
             var dtoJson = JsonConvert.SerializeObject(dto);
-            await _loggger.Debug("created request save object");
+            await _logger.Debug("created request save object");
 
             // create directory
             var requestDataPath = _fileLocation + Constants.RequestDirectory;
             Directory.CreateDirectory(requestDataPath);
-            await _loggger.Debug("created request directory");
+            await _logger.Debug("created request directory");
 
             // write file
             var requestFilename = Path.Combine(requestDataPath, request.Id.ToString());
             await File.WriteAllTextAsync(requestFilename, dtoJson);
-            await _loggger.Debug("finished saving request");
+            await _logger.Debug("finished saving request");
         }
 
         /// <summary>
@@ -270,38 +270,38 @@ namespace paste.bin.ingest.core.data.Repositories
                 RawDataHash = hash,
                 Created = entry.Created,
             };
-            await _loggger.Debug($"created entry object for [{entry.Uri}]");
+            await _logger.Debug($"created entry object for [{entry.Uri}]");
 
             // create directory
             var entryPath = Path.Combine(_fileLocation + Constants.EntryDirectory, dto.Id.ToString());
             Directory.CreateDirectory(entryPath);
-            await _loggger.Debug($"created directory for [{entry.Uri}]");
+            await _logger.Debug($"created directory for [{entry.Uri}]");
 
             if (string.IsNullOrWhiteSpace(entry.RawData))
             {
-                await _loggger.Warning($"entry RawData was null or empty, skipping entry");
+                await _logger.Warning($"entry RawData was null or empty, skipping entry");
                 return;
             }
 
             // write raw data
             var rawFilePath = Path.Combine(entryPath, Constants.Raw);
             await File.WriteAllTextAsync(rawFilePath, entry.RawData);
-            await _loggger.Debug($"saved raw data file for [{entry.Uri}]");
+            await _logger.Debug($"saved raw data file for [{entry.Uri}]");
 
             // write DTO object
             var dtoFilePath = Path.Combine(entryPath, Constants.Data);
             var dtoJson = JsonConvert.SerializeObject(dto);
             await File.WriteAllTextAsync(dtoFilePath, dtoJson);
-            await _loggger.Debug($"saved DTO object file for [{entry.Uri}]");
+            await _logger.Debug($"saved DTO object file for [{entry.Uri}]");
 
             // write quick-hash data
             var hashFilePath = Path.Combine(entryPath, Constants.Hash);
             await File.WriteAllTextAsync(hashFilePath, hash);
-            await _loggger.Debug($"saved quick-hash file for [{entry.Uri}]");
+            await _logger.Debug($"saved quick-hash file for [{entry.Uri}]");
         }
 
         /// <summary>
-        /// check if the raw data already exists in the pastebin data set.
+        /// check if the raw data already exists in the paste bin data set.
         /// </summary>
         /// <param name="rawData">the raw data to hash and check</param>
         /// <returns>true if the hash is found in the data set, false if it does not</returns>
@@ -309,7 +309,7 @@ namespace paste.bin.ingest.core.data.Repositories
         {
             // hash of data
             var hash = await GetSha512HashOfDataAsync(rawData);
-            await _loggger.Debug($"got hash of raw data");
+            await _logger.Debug($"got hash of raw data");
 
             // read quick-hash data
             var existingEntries = await GetEntryIdsFromFolderNamesAsync();
@@ -326,11 +326,11 @@ namespace paste.bin.ingest.core.data.Repositories
                 if (!isExists)
                     continue;
 
-                await _loggger.Info($"found existing entry with id [{entry}]");
+                await _logger.Info($"found existing entry with id [{entry}]");
                 return true;
             }
 
-            await _loggger.Info($"finished checking entry hashes, no existing entry found with matching hash");
+            await _logger.Info($"finished checking entry hashes, no existing entry found with matching hash");
             return false;
         }
 

@@ -21,7 +21,7 @@
         /// new entry constructor for object creation.
         /// </summary>
         /// <param name="name">the name of the entry</param>
-        /// <param name="uri">the URL of the entry on pastebin</param>
+        /// <param name="uri">the URL of the entry on paste bin</param>
         /// <param name="rawData">the raw data of the entry</param>
         public PasteBinEntry(string name, string uri, string rawData)
         {

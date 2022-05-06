@@ -1,39 +1,39 @@
-﻿using System.Security.Cryptography;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using paste.bin.ingest.core.data.Interfaces;
 using paste.bin.ingest.core.models;
+using System.Security.Cryptography;
 
 namespace paste.bin.ingest.core.services
 {
     /// <summary>
-    /// the pastebin service that handles all things pastebin logic.
+    /// the paste bin service that handles all things paste bin logic.
     /// </summary>
     public class PasteBinService
     {
         private readonly string _pasteBinRawUrl;
         private readonly IPasteBinRepository _pasteBinRepository;
-        private readonly Loggger _loggger;
+        private readonly Logger _logger;
 
         /// <summary>
-        /// initialize the pastebin service with a starting pastebin URL, a data repository, and a logger.
+        /// initialize the paste bin service with a starting paste bin URL, a data repository, and a logger.
         /// </summary>
-        /// <param name="pasteBinRawUrl">a valid pastebin URL to pull data from</param>
-        /// <param name="pasteBinRepository">a pastebin data repository</param>
-        /// <param name="loggger">a logger to log messages</param>
-        public PasteBinService(string pasteBinRawUrl, IPasteBinRepository pasteBinRepository, Loggger loggger)
+        /// <param name="pasteBinRawUrl">a valid paste bin URL to pull data from</param>
+        /// <param name="pasteBinRepository">a paste bin data repository</param>
+        /// <param name="logger">a logger to log messages</param>
+        public PasteBinService(string pasteBinRawUrl, IPasteBinRepository pasteBinRepository, Logger logger)
         {
             _pasteBinRawUrl = pasteBinRawUrl;
             _pasteBinRepository = pasteBinRepository;
-            _loggger = loggger;
+            _logger = logger;
         }
 
         /// <summary>
-        /// get pastebin request objects from the data repository by GUIDs.
+        /// get paste bin request objects from the data repository by GUIDs.
         /// optional flag for including entry objects with request objects.
         /// </summary>
         /// <param name="ids">the GUIDs of the requests wanted</param>
         /// <param name="withEntries">flag to include entries or not</param>
-        /// <returns> a list of pastebin request objects</returns>
+        /// <returns> a list of paste bin request objects</returns>
         public async Task<IEnumerable<PasteBinRequest>> GetPasteBinRequestsByIdsAsync(IEnumerable<Guid> ids, bool withEntries = false)
         {
             var requests = await _pasteBinRepository.GetRequestsByIdsAsync(ids, withEntries);
@@ -41,27 +41,27 @@ namespace paste.bin.ingest.core.services
         }
 
         /// <summary>
-        /// send a pastebin request and get entry data.
+        /// send a paste bin request and get entry data.
         /// </summary>
-        /// <param name="basePasteBinUrl">the pastebin URL to extract data from</param>
-        /// <returns>a pastebin request object with entry objects</returns>
+        /// <param name="basePasteBinUrl">the paste bin URL to extract data from</param>
+        /// <returns>a paste bin request object with entry objects</returns>
         public async Task<PasteBinRequest> SendPasteBinRequestAsync(string basePasteBinUrl)
         {
             var pasteBinRequest = new PasteBinRequest(basePasteBinUrl);
             var rawHtml = await GetHtmlDocument(basePasteBinUrl);
-            await _loggger.Debug("obtained initial pastebin html document");
+            await _logger.Debug("obtained initial paste bin html document");
 
-            // extracts all links from pastebin archive table
+            // extracts all links from paste bin archive table
             var dataLinksOrNulls = rawHtml.DocumentNode.SelectSingleNode(Constants.PasteBinTableSelector)
                 .Descendants()
                 .Where(node => node.GetAttributeValue(Constants.Href, null) != null)
                 .ToList();
-            await _loggger.Info($"found {dataLinksOrNulls.Count} pastebin dataLinksOrNulls");
+            await _logger.Info($"found {dataLinksOrNulls.Count} paste bin dataLinksOrNulls");
 
-            await _loggger.Debug("starting pastebin entry extract...");
+            await _logger.Debug("starting paste bin entry extract...");
             foreach (var dataLink in dataLinksOrNulls)
             {
-                // no uri, continue
+                // no URI, continue
                 var uri = dataLink?.GetAttributeValue(Constants.Href, null);
                 if (uri == null) { continue; }
 
@@ -74,37 +74,37 @@ namespace paste.bin.ingest.core.services
 
                 try
                 {
-                    await _loggger.Info($"found [{uri}][{title}]");
+                    await _logger.Info($"found [{uri}][{title}]");
                     var rawDataUrl = _pasteBinRawUrl + uri;
                     var rawData = await GetHtmlDocument(rawDataUrl);
                     var pasteBinEntry = new PasteBinEntry(title, uri, rawData.Text);
                     pasteBinRequest.PasteBinEntries?.Add(pasteBinEntry);
-                    await _loggger.Info($"added to pasteBinRequest.PasteBinEntries for a total count of {pasteBinRequest.PasteBinEntries?.Count}");
+                    await _logger.Info($"added to pasteBinRequest.PasteBinEntries for a total count of {pasteBinRequest.PasteBinEntries?.Count}");
 
-                    // sleep a random amount of time, to throw off pastebin servers...
+                    // sleep a random amount of time, to throw off paste bin servers...
                     var randomNumber = RandomNumberGenerator.GetInt32(20000);
-                    await _loggger.Info($"sleeping for {(10000 + randomNumber) / 1000} seconds...");
+                    await _logger.Info($"sleeping for {(10000 + randomNumber) / 1000} seconds...");
                     Thread.Sleep(millisecondsTimeout: 10000 + randomNumber);
                 }
                 catch (Exception ex)
                 {
-                    await _loggger.Error("error getting pastebin entry data, will continue");
-                    await _loggger.LogObject("exception!", ex);
+                    await _logger.Error("error getting paste bin entry data, will continue");
+                    await _logger.LogObject("exception!", ex);
                 }
             }
-            await _loggger.Debug("finished pastebin entry extract.");
+            await _logger.Debug("finished paste bin entry extract.");
             return pasteBinRequest;
         }
 
         /// <summary>
-        /// save the pastebin request using the data repository.
+        /// save the paste bin request using the data repository.
         /// </summary>
         /// <param name="request">the request to save</param>
         public async Task SavePasteBinRequestAsync(PasteBinRequest request)
         {
-            await _loggger.Debug("starting to save request...");
+            await _logger.Debug("starting to save request...");
             await _pasteBinRepository.SaveRequestAsync(request);
-            await _loggger.Debug("finished saving request");
+            await _logger.Debug("finished saving request");
         }
 
         /// <summary>

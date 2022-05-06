@@ -11,18 +11,18 @@ namespace paste.bin.ingest.scripts.data
     /// </summary>
     internal class DuplicateData
     {
-        private readonly IPasteBinRepository _pastebinRepository;
-        private readonly Loggger _loggger;
+        private readonly IPasteBinRepository _pasteBinRepository;
+        private readonly Logger _logger;
 
         /// <summary>
         /// initialize the duplicate data scripts.
         /// </summary>
-        /// <param name="pastebinRepository">the data repository to use</param>
-        /// <param name="loggger">the logger to use</param>
-        public DuplicateData(IPasteBinRepository pastebinRepository, Loggger loggger)
+        /// <param name="pasteBinRepository">the data repository to use</param>
+        /// <param name="logger">the logger to use</param>
+        public DuplicateData(IPasteBinRepository pasteBinRepository, Logger logger)
         {
-            _pastebinRepository = pastebinRepository;
-            _loggger = loggger;
+            _pasteBinRepository = pasteBinRepository;
+            _logger = logger;
         }
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace paste.bin.ingest.scripts.data
         public async Task CheckAndRemoveDuplicateDataAsync()
         {
             // load all data
-            var allRequestIds = await _pastebinRepository.GetRequestIdsFromFileNamesAsync();
-            var allRequests = (await _pastebinRepository.GetRequestsByIdsAsync(allRequestIds, true)).ToList();
+            var allRequestIds = await _pasteBinRepository.GetRequestIdsFromFileNamesAsync();
+            var allRequests = (await _pasteBinRepository.GetRequestsByIdsAsync(allRequestIds, true)).ToList();
             var allEntries = new List<PasteBinEntry>();
             foreach (var request in allRequests)
             {
@@ -41,15 +41,15 @@ namespace paste.bin.ingest.scripts.data
                     continue;
 
                 allEntries.AddRange(request.PasteBinEntries);
-                await _loggger.Info($"added [{request.PasteBinEntries.Count}] entries to allEntries");
+                await _logger.Info($"added [{request.PasteBinEntries.Count}] entries to allEntries");
             }
-            await _loggger.Debug($"finished getting data from repository");
+            await _logger.Debug($"finished getting data from repository");
 
             // get hashes of all entries
             var entryIdsAndHashes = new Dictionary<string, string>();
             foreach (var entry in allEntries)
                 entryIdsAndHashes.Add(entry.Id.ToString(), await GetSha512HashOfDataAsync(entry.RawData));
-            await _loggger.Debug($"finished getting hashes of all entries");
+            await _logger.Debug($"finished getting hashes of all entries");
 
             // check all entries for duplicate data
             var allDuplicateHashes = new List<string>();
@@ -64,14 +64,14 @@ namespace paste.bin.ingest.scripts.data
                     .ToList();
                 if (duplicateEntryIds.Count <= 1)
                     continue;
-                await _loggger.Info($"found {duplicateEntryIds.Count} duplicate entries for hash [{entry.Value}]");
+                await _logger.Info($"found {duplicateEntryIds.Count} duplicate entries for hash [{entry.Value}]");
 
                 var duplicateEntries = allEntries.Where(e => duplicateEntryIds.Contains(e.Id.ToString())).ToList();
                 var oldestEntry = duplicateEntries.First();
                 foreach (var duplicateEntry in duplicateEntries)
                     if (duplicateEntry.Created < oldestEntry.Created)
                         oldestEntry = duplicateEntry;
-                await _loggger.Info($"found [{oldestEntry.Created}] as oldest date for entry, will only save this entry");
+                await _logger.Info($"found [{oldestEntry.Created}] as oldest date for entry, will only save this entry");
 
                 duplicateEntries.Remove(oldestEntry);
                 allDuplicateHashes.Add(entry.Value);
@@ -89,14 +89,14 @@ namespace paste.bin.ingest.scripts.data
 
                 if (request.PasteBinEntries == null || !request.PasteBinEntries.Any())
                 {
-                    await _loggger.Info("request does not contain any entries, skipping save");
+                    await _logger.Info("request does not contain any entries, skipping save");
                     continue;
                 }
 
-                await _pastebinRepository.SaveRequestAsync(request);
-                await _loggger.Info($"saved request [{request.Id}] with [{request.PasteBinEntries.Count}] entries");
+                await _pasteBinRepository.SaveRequestAsync(request);
+                await _logger.Info($"saved request [{request.Id}] with [{request.PasteBinEntries.Count}] entries");
             }
-            await _loggger.Info($"finished checking and removed duplicate entry data");
+            await _logger.Info($"finished checking and removed duplicate entry data");
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace paste.bin.ingest.scripts.data
             if (string.IsNullOrWhiteSpace(rawData))
             { return string.Empty; }
 
-            // get byte hash of rawdata
+            // get byte hash of rawData
             var rawBytes = Encoding.ASCII.GetBytes(rawData);
             var rawByteStream = new MemoryStream(rawBytes);
             using var sha512 = SHA512.Create();

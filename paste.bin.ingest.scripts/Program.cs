@@ -8,7 +8,7 @@ using paste.bin.ingest.core.services;
 
 // set up:
 // might want to change the data location to save to another folder to prevent data loss
-var loggger = new Loggger("E:\\pastebin\\scripts.logs");
+var loggger = new Logger("E:\\pastebin\\scripts.logs");
 var pasteBinRepository = new PasteBinRepository("E:\\pastebin\\", loggger);
 
 // run script:

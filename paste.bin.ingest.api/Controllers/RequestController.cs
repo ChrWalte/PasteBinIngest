@@ -4,30 +4,30 @@ using paste.bin.ingest.core.services;
 namespace paste.bin.ingest.api.Controllers
 {
     /// <summary>
-    /// API controller for pastebin request data.
+    /// API controller for paste bin request data.
     /// </summary>
     [Route("request")]
     public class RequestController : ControllerBase
     {
         private readonly PasteBinService _pasteBinService;
-        private readonly Loggger _loggger;
+        private readonly Logger _logger;
 
         /// <summary>
-        /// initialize the pastebin request API controller.
+        /// initialize the paste bin request API controller.
         /// </summary>
-        /// <param name="pasteBinService">the pastebin service to use</param>
-        /// <param name="loggger">the logger to use</param>
-        public RequestController(PasteBinService pasteBinService, Loggger loggger)
+        /// <param name="pasteBinService">the paste bin service to use</param>
+        /// <param name="logger">the logger to use</param>
+        public RequestController(PasteBinService pasteBinService, Logger logger)
         {
             _pasteBinService = pasteBinService;
-            _loggger = loggger;
+            _logger = logger;
         }
 
         /// <summary>
-        /// gets the pastebin requests from the given GUIDs.
+        /// gets the paste bin requests from the given GUIDs.
         /// </summary>
         /// <param name="ids">the GUIDs of the wanted requests</param>
-        /// <returns>a list of pastebin data requests</returns>
+        /// <returns>a list of paste bin data requests</returns>
         [HttpGet]
         public async Task<IActionResult> PasteBinRequestAsync(IEnumerable<Guid> ids)
         {
@@ -38,8 +38,8 @@ namespace paste.bin.ingest.api.Controllers
             }
             catch (Exception ex)
             {
-                await _loggger.Error("an exception occurred in Controller.PasteBinRequestAsync(...)");
-                await _loggger.LogObject("the exception", ex);
+                await _logger.Error("an exception occurred in Controller.PasteBinRequestAsync(...)");
+                await _logger.LogObject("the exception", ex);
                 return BadRequest(ex.Message);
             }
         }
