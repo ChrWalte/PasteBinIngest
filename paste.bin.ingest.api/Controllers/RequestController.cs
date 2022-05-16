@@ -24,11 +24,33 @@ namespace paste.bin.ingest.api.Controllers
         }
 
         /// <summary>
+        /// gets the paste bin request guids from the folder names
+        /// </summary>
+        /// <param name="fromDate">(optional) only get requests after fromDate</param>
+        /// <param name="toDate">(optional) only get requests before toDate</param>
+        /// <returns></returns>
+        [HttpGet("ids")]
+        public async Task<IActionResult> PasteBinRequestGuidAsync(DateTime? fromDate = null, DateTime? toDate = null)
+        {
+            try
+            {
+                var requestGuids = await _pasteBinService.GetAllPasteBinRequestGuidsAsync(fromDate, toDate);
+                return Ok(requestGuids);
+            }
+            catch (Exception ex)
+            {
+                await _logger.Error("an exception occurred in Controller.PasteBinRequestGuidAsync(...)");
+                await _logger.LogObject("the exception", ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// gets the paste bin requests from the given GUIDs.
         /// </summary>
         /// <param name="ids">the GUIDs of the wanted requests</param>
         /// <returns>a list of paste bin data requests</returns>
-        [HttpGet]
+        [HttpGet("data")]
         public async Task<IActionResult> PasteBinRequestAsync(IEnumerable<Guid> ids)
         {
             try

@@ -28,15 +28,41 @@ namespace paste.bin.ingest.core.services
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Guid>> GetAllPasteBinRequestGuidsAsync(DateTime? fromDate = null, DateTime? toDate = null)
+        {
+            var requestGuids = await _pasteBinRepository.GetRequestIdsFromFileNamesAsync();
+            if (fromDate == null && toDate == null)
+                return requestGuids;
+            fromDate ??= DateTime.MinValue;
+            toDate ??= DateTime.MaxValue;
+
+            var requestData = (await _pasteBinRepository.GetRequestsByIdsAsync(requestGuids)).ToList();
+            var filteredRequestData =
+                requestData.Where(request => request.TimeStamp >= fromDate && request.TimeStamp <= toDate);
+            var filteredRequestGuids = filteredRequestData.Select(request => request.Id);
+
+            return filteredRequestGuids;
+        }
+
+        /// <summary>
         /// get paste bin request objects from the data repository by GUIDs.
         /// optional flag for including entry objects with request objects.
         /// </summary>
         /// <param name="ids">the GUIDs of the requests wanted</param>
         /// <param name="withEntries">flag to include entries or not</param>
         /// <returns> a list of paste bin request objects</returns>
+        /// <returns> a list of paste bin request objects</returns>
         public async Task<IEnumerable<PasteBinRequest>> GetPasteBinRequestsByIdsAsync(IEnumerable<Guid> ids, bool withEntries = false)
         {
+            await _logger.LogObject("get paste bin requests by ids", ids);
             var requests = await _pasteBinRepository.GetRequestsByIdsAsync(ids, withEntries);
+
+            await _logger.Debug("got paste bin requests");
             return requests;
         }
 
