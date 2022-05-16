@@ -25,6 +25,14 @@ namespace paste.bin.ingest.core.data.Repositories
         {
             _fileLocation = fileLocation;
             _logger = logger;
+
+            var requestsDiskLocation = Path.Combine(_fileLocation, Constants.RequestDirectory[1..]);
+            if (!Directory.Exists(requestsDiskLocation))
+                Directory.CreateDirectory(requestsDiskLocation);
+
+            var entityDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory[1..]);
+            if (!Directory.Exists(entityDiskLocation))
+                Directory.CreateDirectory(entityDiskLocation);
         }
 
         /// <summary>
@@ -89,7 +97,7 @@ namespace paste.bin.ingest.core.data.Repositories
             foreach (var id in givenIds)
             {
                 await _logger.Info($"starting to get {id} from disk...");
-                var requestDataPath = _fileLocation + Constants.RequestDirectory;
+                var requestDataPath = Path.Combine(_fileLocation, Constants.RequestDirectory);
                 var requestFilename = Path.Combine(requestDataPath, id.ToString());
                 var requestDtoJson = await File.ReadAllTextAsync(requestFilename);
                 var requestDto = JsonConvert.DeserializeObject<PasteBinRequestData>(requestDtoJson);
@@ -242,7 +250,7 @@ namespace paste.bin.ingest.core.data.Repositories
             await _logger.Debug("created request save object");
 
             // create directory
-            var requestDataPath = _fileLocation + Constants.RequestDirectory;
+            var requestDataPath = Path.Combine(_fileLocation, Constants.RequestDirectory);
             Directory.CreateDirectory(requestDataPath);
             await _logger.Debug("created request directory");
 
@@ -273,7 +281,7 @@ namespace paste.bin.ingest.core.data.Repositories
             await _logger.Debug($"created entry object for [{entry.Uri}]");
 
             // create directory
-            var entryPath = Path.Combine(_fileLocation + Constants.EntryDirectory, dto.Id.ToString());
+            var entryPath = Path.Combine(_fileLocation, Constants.EntryDirectory, dto.Id.ToString());
             Directory.CreateDirectory(entryPath);
             await _logger.Debug($"created directory for [{entry.Uri}]");
 
@@ -315,7 +323,7 @@ namespace paste.bin.ingest.core.data.Repositories
             var existingEntries = await GetEntryIdsFromFolderNamesAsync();
             foreach (var entry in existingEntries)
             {
-                var entryPath = Path.Combine(_fileLocation + Constants.EntryDirectory, entry.ToString());
+                var entryPath = Path.Combine(_fileLocation, Constants.EntryDirectory, entry.ToString());
                 var hashFilePath = Path.Combine(entryPath, Constants.Hash);
                 if (!File.Exists(hashFilePath))
                     continue;

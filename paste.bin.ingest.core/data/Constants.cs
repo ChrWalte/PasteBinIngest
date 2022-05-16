@@ -3,11 +3,11 @@
     /// <summary>
     /// constants used in the repositories.
     /// </summary>
-    internal class Constants
+    internal static class Constants
     {
         // Directory Names
-        public const string RequestDirectory = "\\requests";
-        public const string EntryDirectory = "\\entries";
+        public const string RequestDirectory = "/requests";
+        public const string EntryDirectory = "/entries";
 
         // Entry File Names
         public const string Raw = "raw.txt";

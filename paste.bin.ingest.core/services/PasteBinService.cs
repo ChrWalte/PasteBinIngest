@@ -28,7 +28,7 @@ namespace paste.bin.ingest.core.services
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="fromDate"></param>
         /// <param name="toDate"></param>
