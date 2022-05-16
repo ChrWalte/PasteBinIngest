@@ -1,0 +1,39 @@
+services:
+
+  # docker run command:
+  # docker run -i -d --rm --name=paste.bin.ingest.api --mount type=bind,source=C:/Users/null/source/repos/paste.bin.ingest/.docker.files/paste.bin.ingest/data,target=/paste.bin.ingest.api/data --mount type=bind,source=C:/Users/null/source/repos/paste.bin.ingest/.docker.files/paste.bin.ingest/api.logs,target=/paste.bin.ingest.api/logs chrwalte/paste.bin.ingest.api:build
+
+  paste.bin.ingest.api:
+    container_name: paste.bin.ingest.api
+    hostname: paste.bin.ingest.api
+    image: chrwalte/paste.bin.ingest.api:build
+    ports:
+      - 8080:80
+    environment:
+      # ASPNETCORE_ENVIRONMENT: "prod"
+      ASPNETCORE_ENVIRONMENT: "dev"
+    volumes:
+      - ".docker-compose.files/paste.bin.ingest/data:/paste.bin.ingest.api/data/"
+      - ".docker-compose.files/paste.bin.ingest/api.logs:/paste.bin.ingest.api/logs/"
+    networks:
+      - paste.bin.ingest.network
+    restart: unless-stopped
+
+  # docker run command:
+  # docker run -i -d --rm --name=paste.bin.ingest.cmd --mount type=bind,source=C:/Users/null/source/repos/paste.bin.ingest/.docker.files/paste.bin.ingest/data,target=/paste.bin.ingest.cmd/data --mount type=bind,source=C:/Users/null/source/repos/paste.bin.ingest/.docker.files/paste.bin.ingest/cmd.logs,target=/paste.bin.ingest.cmd/logs chrwalte/paste.bin.ingest.cmd:build
+
+  paste.bin.ingest.cmd:
+    container_name: paste.bin.ingest.cmd
+    hostname: paste.bin.ingest.cmd
+    image: chrwalte/paste.bin.ingest.cmd:build
+    volumes:
+      - ".docker-compose.files/paste.bin.ingest/data:/paste.bin.ingest.cmd/data/"
+      - ".docker-compose.files/paste.bin.ingest/cmd.logs:/paste.bin.ingest.cmd/logs/"
+    networks:
+      - paste.bin.ingest.network
+    restart: unless-stopped
+
+networks:
+
+  paste.bin.ingest.network:
+    name: paste.bin.ingest.network
