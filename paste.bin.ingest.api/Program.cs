@@ -5,12 +5,17 @@ using paste.bin.ingest.core.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// get path of executable and make path to logs and data
+var rootDirectory = System.IO.Path.GetDirectoryName(args.FirstOrDefault());
+var logDirectory = System.IO.Path.Join(rootDirectory, "logs");
+var dataDirectory = System.IO.Path.Join(rootDirectory, "data");
+
 // Logger:
-var logger = new Logger(Constants.LogSaveLocation);
+var logger = new Logger(logDirectory);
 await logger.Debug(Constants.InitLogger);
 
 // paste bin setup:
-var pasteBinRepository = new PasteBinRepository(Constants.DataSaveLocation, logger);
+var pasteBinRepository = new PasteBinRepository(dataDirectory, logger);
 var pasteBinService = new PasteBinService(Constants.PasteBinRawUrl, pasteBinRepository, logger);
 await logger.Debug(Constants.InitRepoAndService);
 

@@ -8,9 +8,6 @@
         // data constants
         public const string PasteBinRawUrl = "https://pastebin.com/raw";
 
-        public const string DataSaveLocation = "E:\\pastebin";
-        public const string LogSaveLocation = "E:\\pastebin\\api.logs";
-
         // logging constants:
         public const string InitLogger = "initialized logger";
 
