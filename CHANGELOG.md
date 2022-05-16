@@ -1,5 +1,12 @@
 # PasteBinIngest Change Log
 
+## VERSION 2.1.1
+
+- added docker support.
+- added docker-compose.yml deployment file.
+- added docker helper scripts.
+- changed log and data locations to use the root path of the executable (for docker support).
+
 ## VERSION 2.1.0
 
 - complete project refactor
