@@ -1,5 +1,10 @@
 # PasteBinIngest Change Log
 
+## VERSION 2.1.2
+
+- Dockerfile for the ingest was missing cron stuff...
+- updated scripts.
+
 ## VERSION 2.1.1
 
 - added docker support.

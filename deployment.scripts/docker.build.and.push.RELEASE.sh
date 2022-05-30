@@ -2,7 +2,7 @@
 # description of script
 
 # exit when any command fails
-set -e
+set -ev
 
 # variables
 # docker hub profile
@@ -13,34 +13,25 @@ PROJECT="paste.bin.ingest"
 VERSION=$(cat ../VERSION)
 
 # BUILD
-# cli
-echo "[CMD]: docker build --no-cache -t $PROJECT.cli:$VERSION -f ./Dockerfile.cli .."
-docker build --no-cache -t $PROJECT.cli:$VERSION -f ../Dockerfile.cli ..
+# cmd
+docker build --no-cache -t $PROJECT.cmd:$VERSION -f ../Dockerfile.cmd ..
 # api
-echo "[CMD]: docker build --no-cache -t $PROJECT.api:$VERSION -f ./Dockerfile.api .."
 docker build --no-cache -t $PROJECT.api:$VERSION -f ../Dockerfile.api ..
 
 # TAG
-# cli
-echo "[CMD]: docker tag $PROJECT.cli:$VERSION $PROFILE/$PROJECT.cli:$VERSION"
-docker tag $PROJECT.cli:$VERSION $PROFILE/$PROJECT.cli:$VERSION
-echo "[CMD]: docker tag $PROJECT.cli:$VERSION $PROFILE/$PROJECT.cli:latest"
-docker tag $PROJECT.cli:$VERSION $PROFILE/$PROJECT.cli:latest
+# cmd
+docker tag $PROJECT.cmd:$VERSION $PROFILE/$PROJECT.cmd:$VERSION
+docker tag $PROJECT.cmd:$VERSION $PROFILE/$PROJECT.cmd:release
 # api
-echo "[CMD]: docker tag $PROJECT.api:$VERSION $PROFILE/$PROJECT.api:$VERSION"
 docker tag $PROJECT.api:$VERSION $PROFILE/$PROJECT.api:$VERSION
-echo "[CMD]: docker tag $PROJECT.api:$VERSION $PROFILE/$PROJECT.api:latest"
-docker tag $PROJECT.api:$VERSION $PROFILE/$PROJECT.api:latest
+docker tag $PROJECT.api:$VERSION $PROFILE/$PROJECT.api:release
 
 # PUSH
-# cli
-echo "[CMD]: docker push $PROFILE/$PROJECT.cli:$VERSION"
-docker push $PROFILE/$PROJECT.cli:$VERSION
-docker push $PROFILE/$PROJECT.cli:latest
+# cmd
+docker push $PROFILE/$PROJECT.cmd:$VERSION
+docker push $PROFILE/$PROJECT.cmd:release
 # api
-echo "[CMD]: docker push $PROFILE/$PROJECT.api:$VERSION"
 docker push $PROFILE/$PROJECT.api:$VERSION
-docker push $PROFILE/$PROJECT.api:latest
+docker push $PROFILE/$PROJECT.api:release
 
-# finished
-echo "[INFO]: FINISHED BUILD ($PROFILE/$PROJECT:$VERSION)!"
+# docker build, tag, and push RELEASE script finished
