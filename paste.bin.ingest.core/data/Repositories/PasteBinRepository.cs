@@ -26,11 +26,11 @@ namespace paste.bin.ingest.core.data.Repositories
             _fileLocation = fileLocation;
             _logger = logger;
 
-            var requestsDiskLocation = Path.Combine(_fileLocation, Constants.RequestDirectory[1..]);
+            var requestsDiskLocation = Path.Combine(_fileLocation, Constants.RequestDirectory);
             if (!Directory.Exists(requestsDiskLocation))
                 Directory.CreateDirectory(requestsDiskLocation);
 
-            var entityDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory[1..]);
+            var entityDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory);
             if (!Directory.Exists(entityDiskLocation))
                 Directory.CreateDirectory(entityDiskLocation);
         }
