@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# copy everything into the current directory
+# copy everything into the current folder
 COPY . .
 
 # publish the project in release mode
@@ -11,8 +11,12 @@ RUN dotnet publish ./paste.bin.ingest.cmd/paste.bin.ingest.cmd.csproj -c release
 # final/running stage
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 
+# set up stage
+ENV TZ="America/Phoenix"
+RUN date
+
 # create and copy build files into paste.bin.ingest.cmd folder
-WORKDIR /paste.bin.ingest.cmd
+WORKDIR /bin/paste.bin.ingest
 COPY --from=build /src/paste.bin.ingest.cmd/bin/release/net6.0/publish .
 
 # copy the crontab file
@@ -22,7 +26,7 @@ COPY --from=build /src/paste.bin.ingest.cmd.crontab .
 RUN apt-get update && apt-get -y install cron
 
 # save crontab as job
-RUN crontab /paste.bin.ingest.cmd/paste.bin.ingest.cmd.crontab
+RUN crontab /bin/paste.bin.ingest/paste.bin.ingest.cmd.crontab
 
-# run cron on startup
-ENTRYPOINT [ "cron", "-f"]
+# run ingest and cron on startup
+ENTRYPOINT [ "/bin/paste.bin.ingest/paste.bin.ingest.cmd", "&&", "cron", "-f" ]
