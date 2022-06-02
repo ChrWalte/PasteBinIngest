@@ -6,7 +6,8 @@ using paste.bin.ingest.core.data.Repositories;
 using paste.bin.ingest.core.services;
 
 // get path of executable and make path to logs and data
-var rootDirectory = Path.GetDirectoryName(args.FirstOrDefault()) ?? "./";
+var rootDirectory = Path.GetDirectoryName(Environment.GetCommandLineArgs().FirstOrDefault()) ?? "./";
+
 var logDirectory = Path.Join(rootDirectory, "logs");
 var dataDirectory = Path.Join(rootDirectory, "data");
 
