@@ -1,5 +1,11 @@
 # PasteBinIngest Change Log
 
+## VERSION 2.2.0
+
+- major docker changes.
+- updates docker-compose and docker scripts.
+- addressed some issues.
+
 ## VERSION 2.1.2
 
 - Dockerfile for the ingest was missing cron stuff...

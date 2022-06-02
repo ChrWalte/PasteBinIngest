@@ -1,5 +1,5 @@
 # Running List of TODOs for the PasteBinIngest
 
-## TODO: Add some TODOs
+## script to sync data
 
-Add something TODO
+- create a c# script to sync data between two folders.
