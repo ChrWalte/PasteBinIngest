@@ -1,9 +1,9 @@
-﻿// Imports:
-
-using System.Security.Cryptography;
+﻿
+// Imports:
 using paste.bin.ingest.cmd;
 using paste.bin.ingest.core.data.Repositories;
 using paste.bin.ingest.core.services;
+using System.Security.Cryptography;
 
 // get path of executable and make path to logs and data
 var rootDirectory = Path.GetDirectoryName(Environment.GetCommandLineArgs().FirstOrDefault()) ?? "./";

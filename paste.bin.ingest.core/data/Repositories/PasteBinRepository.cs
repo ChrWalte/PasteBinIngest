@@ -41,7 +41,7 @@ namespace paste.bin.ingest.core.data.Repositories
         /// <returns>a list of GUIDs of all saved requests</returns>
         public async Task<IEnumerable<Guid>> GetRequestIdsFromFileNamesAsync()
         {
-            var requestsDiskLocation = Path.Combine(_fileLocation, Constants.RequestDirectory[1..]);
+            var requestsDiskLocation = Path.Combine(_fileLocation, Constants.RequestDirectory);
             var fileNames = Directory.GetFiles(requestsDiskLocation);
             await _logger.Info($"got {fileNames.Length} request ids from request folder");
 
@@ -63,7 +63,7 @@ namespace paste.bin.ingest.core.data.Repositories
         /// <returns>a list of GUIDs of all saved entries</returns>
         public async Task<IEnumerable<Guid>> GetEntryIdsFromFolderNamesAsync()
         {
-            var entityDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory[1..]);
+            var entityDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory);
             var dirs = Directory.GetDirectories(entityDiskLocation);
             await _logger.Info($"got {dirs.Length} entry URLs from entry folder");
 
@@ -140,7 +140,7 @@ namespace paste.bin.ingest.core.data.Repositories
         {
             var wantedIds = ids.ToList();
             var wantedEntries = new List<PasteBinEntry>();
-            var allEntryDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory[1..]);
+            var allEntryDiskLocation = Path.Combine(_fileLocation, Constants.EntryDirectory);
             foreach (var id in wantedIds)
             {
                 await _logger.Info($"checking {id} entry from disk...");
