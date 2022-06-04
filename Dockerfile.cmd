@@ -28,5 +28,5 @@ RUN apt-get update && apt-get -y install cron
 # save crontab as job
 RUN crontab /bin/paste.bin.ingest/paste.bin.ingest.cmd.crontab
 
-# run ingest and cron on startup
-ENTRYPOINT [ "/bin/paste.bin.ingest/paste.bin.ingest.cmd", "&&", "cron", "-f" ]
+# run cron on startup
+ENTRYPOINT [ "cron", "-f" ]
