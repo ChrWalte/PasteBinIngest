@@ -1,1 +1,1 @@
-* */4 * * * dotnet paste.bin.ingest.cmd.dll
+0 */4 * * * /bin/paste.bin.ingest/paste.bin.ingest.cmd

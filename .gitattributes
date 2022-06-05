@@ -1,0 +1,5 @@
+# sh scripts need to be lf line endings
+*.sh eol=lf
+
+# crontab files need to be lf line endings
+*.crontab eol=lf
