@@ -28,16 +28,17 @@ namespace paste.bin.ingest.core.services
         }
 
         /// <summary>
-        ///
+        /// gets all paste bin request GUIDs from the folder names. this can be filtered down using the request creation date.
         /// </summary>
-        /// <param name="fromDate"></param>
-        /// <param name="toDate"></param>
+        /// <param name="fromDate">optional minimum creation date filter</param>
+        /// <param name="toDate">optional maximum creation date filter</param>
         /// <returns></returns>
         public async Task<IEnumerable<Guid>> GetAllPasteBinRequestGuidsAsync(DateTime? fromDate = null, DateTime? toDate = null)
         {
             var requestGuids = await _pasteBinRepository.GetRequestIdsFromFileNamesAsync();
             if (fromDate == null && toDate == null)
                 return requestGuids;
+
             fromDate ??= DateTime.MinValue;
             toDate ??= DateTime.MaxValue;
 
@@ -100,17 +101,22 @@ namespace paste.bin.ingest.core.services
 
                 try
                 {
-                    await _logger.Info($"found [{uri}][{title}]");
                     var rawDataUrl = _pasteBinRawUrl + uri;
+                    await _logger.Info($"found [{rawDataUrl}][{title}]");
                     var rawData = await GetHtmlDocument(rawDataUrl);
                     var pasteBinEntry = new PasteBinEntry(title, uri, rawData.Text);
                     pasteBinRequest.PasteBinEntries?.Add(pasteBinEntry);
                     await _logger.Info($"added to pasteBinRequest.PasteBinEntries for a total count of {pasteBinRequest.PasteBinEntries?.Count}");
 
-                    // sleep a random amount of time, to throw off paste bin servers...
-                    var randomNumber = RandomNumberGenerator.GetInt32(20000);
-                    await _logger.Info($"sleeping for {(10000 + randomNumber) / 1000} seconds...");
-                    Thread.Sleep(millisecondsTimeout: 10000 + randomNumber);
+                    // get currentEnvironment from EnvironmentVariable
+                    var currentEnvironment = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "NO_ENVIRONMENT_FOUND";
+                    if (currentEnvironment != "dev")
+                    {
+                        // sleep a random amount of time, to throw off paste bin servers...
+                        var randomNumber = RandomNumberGenerator.GetInt32(20000);
+                        await _logger.Info($"sleeping for {(10000 + randomNumber) / 1000} seconds...");
+                        Thread.Sleep(millisecondsTimeout: 10000 + randomNumber);
+                    }
                 }
                 catch (Exception ex)
                 {
