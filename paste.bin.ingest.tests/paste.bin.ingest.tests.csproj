@@ -1,10 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
+    <Description>the testing part of the paste.bin.ingest</Description>
+    <Copyright>Christopher Walters</Copyright>
+    <PackageProjectUrl>https://github.com/ChrWalte/paste.bin.ingest</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ChrWalte/paste.bin.ingest</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

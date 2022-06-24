@@ -1,5 +1,12 @@
 # PasteBinIngest Change Log
 
+## VERSION 2.2.1
+
+- more docker changes.
+- linux docker container was failing due to file slashes.
+- removed timezone setting within container, this can be handled by users.
+- updated deployment scripts.
+
 ## VERSION 2.2.0
 
 - major docker changes.

@@ -46,12 +46,13 @@ namespace paste.bin.ingest.core.data.Repositories
             await _logger.Info($"got {fileNames.Length} request ids from request folder");
 
             var cleanedFileNames = fileNames.Select(dir
-                => dir[requestsDiskLocation.Length..].Replace("\\", string.Empty))
-                .ToArray();
+                => dir[requestsDiskLocation.Length..]
+                    .Replace("\\", string.Empty) // windows file path
+                    .Replace("/", string.Empty)) // linux file path
+                .ToList();
             await _logger.Debug($"cleaned {fileNames.Length} request ids by removing directory path");
 
-            var requestIds = cleanedFileNames.Select(fileName
-                => Guid.TryParse(fileName, out var id) ? id : Guid.Empty).ToList();
+            var requestIds = cleanedFileNames.Select(fileName => Guid.Parse(fileName)).ToList();
             await _logger.Debug($"converted {fileNames.Length} request ids into GUIDs");
 
             return requestIds;
@@ -69,12 +70,13 @@ namespace paste.bin.ingest.core.data.Repositories
 
             // remove entityDataPath from each URL
             var cleanedDirs = dirs.Select(dir
-                    => dir[entityDiskLocation.Length..].Replace("\\", string.Empty))
-                .ToArray();
+                    => dir[entityDiskLocation.Length..]
+                        .Replace("\\", string.Empty) // windows file path
+                        .Replace("/", string.Empty)) // linux file path
+                    .ToList();
             await _logger.Debug($"cleaned {dirs.Length} entry URLs by removing directory path");
 
-            var entryIds = cleanedDirs.Select(fileName
-                => Guid.TryParse(fileName, out var id) ? id : Guid.Empty).ToList();
+            var entryIds = cleanedDirs.Select(fileName => Guid.Parse(fileName)).ToList();
             await _logger.Debug($"converted {dirs.Length} entry ids into GUIDs");
             return entryIds;
         }
@@ -180,12 +182,10 @@ namespace paste.bin.ingest.core.data.Repositories
                         await _logger.Warning($"entry [{id}] data file not found, skipping");
                         continue;
                     }
-                    else
-                    {
-                        var entryRawData = await File.ReadAllTextAsync(entryRawDataLocation);
-                        entry.RawData = entryRawData;
-                        await _logger.Info($"added {entryDto.Id} entry raw data");
-                    }
+
+                    var entryRawData = await File.ReadAllTextAsync(entryRawDataLocation);
+                    entry.RawData = entryRawData;
+                    await _logger.Info($"added {entryDto.Id} entry raw data");
                 }
 
                 wantedEntries.Add(entry);
@@ -326,7 +326,10 @@ namespace paste.bin.ingest.core.data.Repositories
                 var entryPath = Path.Combine(_fileLocation, Constants.EntryDirectory, entry.ToString());
                 var hashFilePath = Path.Combine(entryPath, Constants.Hash);
                 if (!File.Exists(hashFilePath))
+                {
+                    await _logger.Info($"no hash file found at [{hashFilePath}]");
                     continue;
+                }
 
                 // check quick-hash data
                 var readHash = await File.ReadAllTextAsync(hashFilePath);

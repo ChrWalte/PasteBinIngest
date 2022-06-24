@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "paste.bin.ingest.cmd": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ENVIRONMENT": "dev"
+      }
+    }
+  }
+}

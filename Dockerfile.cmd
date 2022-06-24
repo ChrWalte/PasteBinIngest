@@ -11,10 +11,6 @@ RUN dotnet publish ./paste.bin.ingest.cmd/paste.bin.ingest.cmd.csproj -c release
 # final/running stage
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 
-# set up stage
-ENV TZ="America/Phoenix"
-RUN date
-
 # create and copy build files into paste.bin.ingest.cmd folder
 WORKDIR /bin/paste.bin.ingest
 COPY --from=build /src/paste.bin.ingest.cmd/bin/release/net6.0/publish .
