@@ -5,6 +5,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>some extra scripts for the paste.bin.ingest</Description>
+    <Copyright>Christopher Walters</Copyright>
+    <PackageProjectUrl>https://github.com/ChrWalte/paste.bin.ingest</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ChrWalte/paste.bin.ingest</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
